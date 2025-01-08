@@ -82,7 +82,7 @@ texts = None
 
 # Run the Image Prompt Demo file
 
-To run the image_prompt_demo.py:
+To run the image_prompt_demo.py (this is run from the capstone folder, NOT inside the YOLO folder):
 ```
-python demo/image_prompt_demo.py  configs/image_prompts/yolo_world_v2_l_vlpan_bn_2e-4_80e_8gpus_image_prompt_demo.py  model/yolo_world_v2_l_image_prompt_adapter-719a7afb.pth
+python YOLO-World/demo/image_prompt_demo.py  YOLO-World/configs/image_prompts/yolo_world_v2_l_vlpan_bn_2e-4_80e_8gpus_image_prompt_demo.py  weights/yolo_world_v2_l_image_prompt_adapter-719a7afb.pth
 ```
