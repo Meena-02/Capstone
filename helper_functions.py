@@ -66,9 +66,16 @@ def adaptive_nms(bboxes, base_thr=0.5, dense_scene_thr=50):
     return nms_thr
 
 def extract_object(target_image, pred_instances):
+    
+    if pred_instances is None:
+        raise gr.Error("Prediction instances are missing")
+    
     xyxy = pred_instances['bboxes']
     class_id = pred_instances['labels']
     confidence = pred_instances['scores']
+    
+    if len(xyxy) == 0:
+        raise gr.Error("No objects were detected in the target image")
     
     score_thr = np.percentile(confidence, 70)
     
@@ -78,6 +85,9 @@ def extract_object(target_image, pred_instances):
         if x >= score_thr:
             index_list.append(index)
         index += 1
+        
+    if not index_list:
+        raise gr.Error("No objects passed the confidence threshold. Adjust the threshold")
     
     detected_obj = []
     for x in index_list:
@@ -89,6 +99,16 @@ def extract_object(target_image, pred_instances):
 
 def extract_texts(detected_objects, text_model, input_text):
     import re
+    
+    if detected_objects is None or len(detected_objects) == 0:
+        raise gr.Error("No objects detected found for text extraction")
+
+    if text_model is None:
+        raise gr.Error("Text model is not provided")
+    
+    if input_text is None or input_text.strip() == "":
+        raise gr.Error("Text prompt is empty. Please enter keywords")
+    
     def check_text(extracted_text, input_text):
         input_text = re.findall(r'\b\w+\b', input_text)
         input_text = [x.lower() for x in input_text]
@@ -107,25 +127,35 @@ def extract_texts(detected_objects, text_model, input_text):
         return image_text, num_of_matched_words 
 
     detected_obj_list = []
-    for img in detected_objects:
-        
+    for index, img in enumerate(detected_objects):
         image = {}
-        img = np.array(img)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        
+        try:
+            img = np.array(img)
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        except Exception as e:
+            raise gr.Error(f"Error processing object {index}: {str(e)}")
         
         result = text_model.ocr(img)
         result = result[0]
+        
+        if result is None:
+            gr.Warning(f"OCR failed to extract text from object {index}")
+            continue
+
         extracted_text = [line[1][0] for line in result]
-        extracted_score = [line[1][1] for line in result]
+        # extracted_score = [line[1][1] for line in result]
         
-        image_text, num_of_matched_words = check_text(extracted_text, input_text)
-        
-        image['image'] = img
-        image['text'] = image_text
-        image['score'] = num_of_matched_words
-        
-        detected_obj_list.append(image)
+        if len(extracted_text) == 0:
+            gr.Warning(f"No text was extracted from object {index}")
+            continue
+        else:
+            image_text, num_of_matched_words = check_text(extracted_text, input_text)
+            
+            image['image'] = img
+            image['text'] = image_text
+            image['score'] = num_of_matched_words
+            
+            detected_obj_list.append(image)
 
         # boxes = [line[0] for line in result]
         # text = [texts.append(line[1][0]) for line in result]
@@ -137,13 +167,14 @@ def extract_texts(detected_objects, text_model, input_text):
     return detected_obj_list
    
 def extract_final_object(detected_object_list):
-    from operator import itemgetter
     
+    if len(detected_object_list) == 0:
+        raise gr.Error("No object was detected. Unable to extract final object")
+    
+    from operator import itemgetter
     detected_object_list = sorted(detected_object_list, key=itemgetter('score'), reverse=True)
     
     return detected_object_list[0]
-
-# Starbucks, Dark Roast, Bold & Roasty, Premium Instant
 
 def run_image(runner,
               vision_encoder,

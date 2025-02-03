@@ -14,6 +14,7 @@ from transformers import (AutoProcessor, CLIPVisionModelWithProjection)
 def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
     with gr.Blocks() as demo:
         gr.Markdown("<center><h1>Capstone Demo</h1></center>")
+        
         with gr.Row():
             with gr.Column():
                 target_image = gr.Image(label="Target Image", type="pil")
@@ -24,18 +25,29 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
             with gr.Column():
                 output_image = gr.Image(label="Output Image", type="pil")
                 input_text = gr.Textbox(label="Text Prompt")
+                
+        def validate_and_run(target_image, input_text, prompt_image):
+            if target_image is None:
+                raise gr.Error("Please upload target image")
+            if prompt_image is None:
+                raise gr.Error("Please upload reference image")
+            if not input_text.strip():
+                raise gr.Error("Please enter a text prompt")
+            
+            output_image = hf.run_image(runner, vision_encoder, vision_processor, padding_embed, text_model, target_image, input_text, prompt_image)
+            return output_image
+        
+        
         submit_button.click(
-            partial(hf.run_image, runner, vision_encoder, vision_processor, padding_embed, text_model), [
-                target_image,
-                input_text,
-                ref_image
-            ], 
-            [output_image]
+            validate_and_run,
+            inputs=[target_image, input_text, ref_image],
+            outputs=[output_image]
         )
         
         clear_button.click(
-            lambda: [None, None, '', None], None,
-                    [target_image, ref_image, input_text, output_image])
+            lambda: [None, None, '', None], 
+            inputs=[],
+            outputs = [target_image, ref_image, input_text, output_image])
         
         demo.launch()
 
