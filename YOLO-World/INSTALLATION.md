@@ -86,3 +86,20 @@ To run the image_prompt_demo.py (this is run from the capstone folder, NOT insid
 ```
 python YOLO-World/demo/image_prompt_demo.py  YOLO-World/configs/image_prompts/yolo_world_v2_l_vlpan_bn_2e-4_80e_8gpus_image_prompt_demo.py  weights/yolo_world_v2_l_image_prompt_adapter-719a7afb.pth
 ```
+
+# Install PaddleOCR
+
+1. Install paddle with gpu according to your computer settings. (https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html)
+```
+python -m pip install paddlepaddle-gpu==2.6.2 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+```
+
+2. Install paddleocr
+```
+pip install paddleocr
+```
+
+3. Git clone the paddleocr github repository
+```
+https://github.com/PaddlePaddle/PaddleOCR.git
+```
