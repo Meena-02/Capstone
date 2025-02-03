@@ -1,36 +1,83 @@
 import gradio as gr
-import cv2
+import helper_functions as hf
 
-def inputs(target_image, ref_image, text, max_box, nms, score):
-    print(f"Target image: {type(target_image)}")
-    print(f"Ref image: {type(ref_image)}")
-    print(f"Text: {text}")
-    print(f"Max Boxes: {max_box}")
-    print(f"NMS: {nms}")
-    print(f"Score: {score}")
-    
-    return target_image
+from paddleocr import PaddleOCR, draw_ocr
 
-def clear_inputs():
-    return None, None, None, "", 100, 0.7, 0.3
+from functools import partial 
+from mmengine.config import Config, DictAction, ConfigDict
+from mmengine.runner import Runner
+from mmyolo.registry import RUNNERS
+from mmengine.dataset import Compose
+from transformers import (AutoTokenizer, CLIPTextModelWithProjection)
+from transformers import (AutoProcessor, CLIPVisionModelWithProjection)
 
-with gr.Blocks() as demo:
-    gr.Markdown("<center><h1>Capstone Demo</h1></center>")
-    with gr.Row():
-        with gr.Column():
-            target_image = gr.Image(label="Target Image")
-            ref_image = gr.Image(label="Reference Image")
-            with gr.Row():
-                submit_button = gr.Button("Submit")
-                clear_button = gr.Button("Clear")
-        with gr.Column():
-            output_image = gr.Image(label="Output Image")
-            input_text = gr.Textbox(label="Text Prompt")
-            max_box = gr.Slider(minimum=0, maximum=300, label="Maximum Number of Boxes", step=1, value=100)
-            nms = gr.Slider(minimum=0, maximum=1, label="NMS Threshold", step=0.01, value=0.7)
-            score = gr.Slider(minimum=0, maximum=1, label="Score Threshold", step=0.01, value=0.3)
+def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
+    with gr.Blocks() as demo:
+        gr.Markdown("<center><h1>Capstone Demo</h1></center>")
+        with gr.Row():
+            with gr.Column():
+                target_image = gr.Image(label="Target Image", type="pil")
+                ref_image = gr.Image(label="Reference Image", type="pil", height=300)
+                with gr.Row():
+                    submit_button = gr.Button("Submit")
+                    clear_button = gr.Button("Clear")
+            with gr.Column():
+                output_image = gr.Image(label="Output Image", type="pil")
+                input_text = gr.Textbox(label="Text Prompt")
+        submit_button.click(
+            partial(hf.run_image, runner, vision_encoder, vision_processor, padding_embed, text_model), [
+                target_image,
+                input_text,
+                ref_image
+            ], 
+            [output_image]
+        )
+        
+        clear_button.click(
+            lambda: [None, None, '', None], None,
+                    [target_image, ref_image, input_text, output_image])
+        
+        demo.launch()
+
+if __name__ == '__main__':
     
-    submit_button.click(inputs, inputs=[target_image, ref_image, input_text, max_box, nms, score], outputs=[output_image])
-    clear_button.click(clear_inputs, inputs=[], outputs=[target_image, ref_image, output_image, input_text, max_box, nms, score])
+    paddle_ocr = PaddleOCR(lang='en')
     
-demo.launch()
+    demo_cfg = hf.read_config("config.yaml")
+    visual_cfg = Config.fromfile(demo_cfg['Visual']['config_path'])
+    
+    visual_cfg.load_from = demo_cfg['Visual']['model_path']
+    visual_cfg.work_dir = demo_cfg['Visual']['work_dir']
+    
+    
+    if 'runner_type' not in visual_cfg:
+        runner = Runner.from_cfg(visual_cfg)
+    else:
+        runner = RUNNERS.build(visual_cfg)
+        
+    runner.call_hook('before_run')
+    runner.load_or_resume()
+    pipepline = visual_cfg.test_dataloader.dataset.pipeline
+    pipepline[0].type = 'mmdet.LoadImageFromNDArray'
+    runner.pipeline = Compose(pipepline)
+    runner.model.eval()
+    
+    clip_model = "openai/clip-vit-base-patch32"
+    vision_model = CLIPVisionModelWithProjection.from_pretrained(clip_model)
+    processor = AutoProcessor.from_pretrained(clip_model)
+    device = 'cuda:0'
+    vision_model.to(device)
+    
+    texts = [' ']
+    tokenizer = AutoTokenizer.from_pretrained(clip_model)
+    text_model = CLIPTextModelWithProjection.from_pretrained(clip_model)
+    text_model.to(device)
+    texts = tokenizer(text=texts, return_tensors='pt', padding=True)
+    texts = texts.to(device)
+    text_outputs = text_model(**texts)
+    txt_feats = text_outputs.text_embeds
+    txt_feats = txt_feats / txt_feats.norm(p=2, dim=-1, keepdim=True)
+    txt_feats = txt_feats.reshape(-1, txt_feats.shape[-1])
+    txt_feats = txt_feats[0].unsqueeze(0)
+    
+    demo(runner, vision_model, processor, txt_feats, paddle_ocr)
