@@ -72,29 +72,39 @@ def extract_object(target_image, pred_instances):
     
     xyxy = pred_instances['bboxes']
     class_id = pred_instances['labels']
-    confidence = pred_instances['scores']
+    confidence = pred_instances['scores']  
     
     if len(xyxy) == 0:
         raise gr.Error("No objects were detected in the target image")
-    
-    score_thr = np.percentile(confidence, 70)
-    
-    index_list = []
-    index = 0
-    for x in confidence:
-        if x >= score_thr:
-            index_list.append(index)
-        index += 1
         
-    if not index_list:
-        raise gr.Error("No objects passed the confidence threshold. Adjust the threshold")
+    # score_thr = np.percentile(confidence, 70)
+    # score_thr = 0.2
+    
+    # index_list = []
+    # index = 0
+    # for x in confidence:
+    #     if x >= score_thr:
+    #         index_list.append(index)
+    #     index += 1
+        
+    # if not index_list:
+    #     raise gr.Error("No objects passed the confidence threshold. Adjust the threshold")
     
     detected_obj = []
-    for x in index_list:
+    index = len(confidence)
+    for x in range(0, index):
         coord = xyxy[x]
         cropped_img = target_image.crop(tuple(coord))
         detected_obj.append(cropped_img)
-        
+    
+    # for i, x in enumerate(detected_obj):
+    #     img = np.array(x)
+    #     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    #     cv2.imshow(f"object: {i}", img)
+    #     cv2.waitKey(0)
+    
+    # cv2.destroyAllWindows()
+    
     return detected_obj
 
 def extract_texts(detected_objects, text_model, input_text):
@@ -151,7 +161,11 @@ def extract_texts(detected_objects, text_model, input_text):
         else:
             image_text, num_of_matched_words = check_text(extracted_text, input_text)
             
-            image['image'] = img
+            if num_of_matched_words == 0:
+                gr.Warning(f"Input text and extracted text do not match from object {index}")
+                continue
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            image['image'] = Image.fromarray(img)
             image['text'] = image_text
             image['score'] = num_of_matched_words
             
@@ -164,6 +178,9 @@ def extract_texts(detected_objects, text_model, input_text):
         # im_show = draw_ocr(img, boxes, texts, scores, font_path='PaddleOCR/doc/fonts/simfang.ttf')
         # im_show = Image.fromarray(im_show)
         # im_show.show()
+        if len(detected_obj_list) == 0:
+            gr.Warning("No matching text found in any detected objects.")
+            return []
     return detected_obj_list
    
 def extract_final_object(detected_object_list):
@@ -226,7 +243,7 @@ def run_image(runner,
         pred_instances = output.pred_instances
         
     nms_thr = adaptive_nms(pred_instances.bboxes)
-    score_thr = 0.2
+    score_thr = 0.3
     max_num_boxes = 100
     
     keep = nms(pred_instances.bboxes,
@@ -252,19 +269,21 @@ def run_image(runner,
         f"{texts[class_id][0]} {confidence:0.2f}" for class_id, confidence in
         zip(detections.class_id, detections.confidence)
     ]
+    
+    # img2 = np.array(target_image)
+    # img2 = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
+    # img2 = BOUNDING_BOX_ANNOTATOR.annotate(img2, detections)
+    # img2 = LABEL_ANNOTATOR.annotate(img2, detections, labels=labels)
+    # img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    # img2 = Image.fromarray(img2)
+    # img2.show()
+    
     detected_objects = extract_object(target_image, pred_instances)
     detected_objects_list = extract_texts(detected_objects, text_model, input_text)
     final_object = extract_final_object(detected_objects_list)
     
     # returning final image
-    image = np.array(final_object['image'])
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert RGB to BGR
-    image = BOUNDING_BOX_ANNOTATOR.annotate(image, detections)
-    image = LABEL_ANNOTATOR.annotate(image, detections, labels=labels)
-    if masks is not None:
-        image = MASK_ANNOTATOR.annotate(image, detections)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-    image = Image.fromarray(image)
+    image = final_object['image']
     return image
 
 
