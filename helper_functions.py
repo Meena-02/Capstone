@@ -286,6 +286,90 @@ def run_image(runner,
     image = final_object['image']
     return image
 
+def run_image_eval_indv(runner,
+              vision_encoder,
+              vision_processor,
+              padding_token,
+              text_model,
+              target_image,
+              input_text,
+              prompt_image,
+            ):
+    target_image = target_image.convert('RGB')
+    add_padding = True
+    if prompt_image is not None:
+        texts = [['object'], ['']]
+        projector = None
+        
+        if hasattr(runner.model, 'image_prompt_encoder'):
+            projector = runner.model.image_prompt_encoder.projector
+            
+        prompt_embeddings = generate_image_embeddings(
+            prompt_image,
+            vision_encoder=vision_encoder,
+            vision_processor=vision_processor,
+            projector=projector)
+
+        if add_padding == True:
+            prompt_embeddings = torch.cat([prompt_embeddings, padding_token],
+                                          dim=0)
+            
+        prompt_embeddings = prompt_embeddings / prompt_embeddings.norm(
+            p=2, dim=-1, keepdim=True)
+        runner.model.num_test_classes = prompt_embeddings.shape[0]
+        runner.model.setembeddings(prompt_embeddings[None])
+    
+    else:
+        runner.model.setembeddings(None)
+        texts = [[t.strip()] for t in input_text.split(',')]
+        
+    data_info = dict(img_id=0, img=np.array(target_image), texts=texts)
+    data_info = runner.pipeline(data_info)
+    data_batch = dict(inputs=data_info['inputs'].unsqueeze(0),
+                      data_samples=[data_info['data_samples']])    
+        
+    with autocast(enabled=False), torch.no_grad():
+        if (prompt_image is not None) and ('texts' in data_batch['data_samples'][
+                0]):
+            del data_batch['data_samples'][0]['texts']
+        output = runner.model.test_step(data_batch)[0]
+        pred_instances = output.pred_instances
+        
+    nms_thr = adaptive_nms(pred_instances.bboxes)
+    score_thr = 0.4
+    max_num_boxes = 100
+    
+    keep = nms(pred_instances.bboxes,
+               pred_instances.scores,
+               iou_threshold=nms_thr)
+    pred_instances = pred_instances[keep]
+    pred_instances = pred_instances[pred_instances.scores.float() > score_thr]
+    
+    if len(pred_instances.scores) > max_num_boxes:
+        indices = pred_instances.scores.float().topk(max_num_boxes)[1]
+        pred_instances = pred_instances[indices]
+        
+    pred_instances = pred_instances.cpu().numpy()
+    if 'masks' in pred_instances:
+        masks = pred_instances['masks']
+    else:
+        masks = None
+    detections = sv.Detections(xyxy=pred_instances['bboxes'],
+                               class_id=pred_instances['labels'],
+                               confidence=pred_instances['scores'],
+                               mask=masks)
+    labels = [
+        f"{texts[class_id][0]} {confidence:0.2f}" for class_id, confidence in
+        zip(detections.class_id, detections.confidence)
+    ]
+    img2 = np.array(target_image)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_RGB2BGR)
+    img2 = BOUNDING_BOX_ANNOTATOR.annotate(img2, detections)
+    img2 = LABEL_ANNOTATOR.annotate(img2, detections, labels=labels)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+    img2 = Image.fromarray(img2)
+    img2.show()
+    return pred_instances
 
     
     
