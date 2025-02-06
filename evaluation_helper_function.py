@@ -4,7 +4,6 @@ from functools import partial
 import cv2
 import torch
 import numpy as np
-import gradio as gr
 from PIL import Image
 import supervision as sv
 from torchvision.ops import nms
@@ -13,30 +12,11 @@ from mmdet.datasets import CocoDataset
 
 from paddleocr import draw_ocr
 
-BOUNDING_BOX_ANNOTATOR = sv.BoundingBoxAnnotator(thickness=2)
-MASK_ANNOTATOR = sv.MaskAnnotator()
-
 def read_config(filepath):
     with open(filepath, 'r') as file:
         config = yaml.safe_load(file)
         
     return config
-
-class LabelAnnotator(sv.LabelAnnotator):
-
-    @staticmethod
-    def resolve_text_background_xyxy(
-        center_coordinates,
-        text_wh,
-        position,
-    ):
-        center_x, center_y = center_coordinates
-        text_w, text_h = text_wh
-        return center_x, center_y, center_x + text_w, center_y + text_h
-
-LABEL_ANNOTATOR = LabelAnnotator(text_padding=4,
-                                 text_scale=0.5,
-                                 text_thickness=1)
 
 def generate_image_embeddings(prompt_image,
                               vision_encoder,
@@ -66,58 +46,46 @@ def adaptive_nms(bboxes, base_thr=0.5, dense_scene_thr=50):
     return nms_thr
 
 def extract_object(target_image, pred_instances):
+    detected_obj = []
     
     if pred_instances is None:
-        raise gr.Error("Prediction instances are missing")
+        print(F"Error: Prediction instances are missing")
+        return detected_obj
     
     xyxy = pred_instances['bboxes']
     class_id = pred_instances['labels']
     confidence = pred_instances['scores']  
     
     if len(xyxy) == 0:
-        raise gr.Error("No objects were detected in the target image")
-        
-    # score_thr = np.percentile(confidence, 70)
-    # score_thr = 0.2
-    
-    # index_list = []
-    # index = 0
-    # for x in confidence:
-    #     if x >= score_thr:
-    #         index_list.append(index)
-    #     index += 1
-        
-    # if not index_list:
-    #     raise gr.Error("No objects passed the confidence threshold. Adjust the threshold")
-    
-    detected_obj = []
+        print(f"Error: No objects were detected in the target image")
+        return detected_obj
+
     index = len(confidence)
     for x in range(0, index):
+        object = {}
         coord = xyxy[x]
         cropped_img = target_image.crop(tuple(coord))
-        detected_obj.append(cropped_img)
-    
-    # for i, x in enumerate(detected_obj):
-    #     img = np.array(x)
-    #     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    #     cv2.imshow(f"object: {i}", img)
-    #     cv2.waitKey(0)
-    
-    # cv2.destroyAllWindows()
+        object['image'] = cropped_img
+        object['xyxy'] = coord
+        detected_obj.append(object)
     
     return detected_obj
 
 def extract_texts(detected_objects, text_model, input_text):
     import re
+    detected_obj_list = []
     
     if detected_objects is None or len(detected_objects) == 0:
-        raise gr.Error("No objects detected found for text extraction")
+        print(f"Error: No objects detected found for text extraction")
+        return detected_obj_list
 
     if text_model is None:
-        raise gr.Error("Text model is not provided")
+        print(f"Error: Text model is not provided")
+        return detected_obj_list
     
     if input_text is None or input_text.strip() == "":
-        raise gr.Error("Text prompt is empty. Please enter keywords")
+        print(f"Error: Text prompt is empty. Please enter keywords")
+        return detected_obj_list
     
     def check_text(extracted_text, input_text):
         input_text = re.findall(r'\b\w+\b', input_text)
@@ -136,57 +104,52 @@ def extract_texts(detected_objects, text_model, input_text):
                 num_of_matched_words += 1
         return image_text, num_of_matched_words 
 
-    detected_obj_list = []
-    for index, img in enumerate(detected_objects):
+    
+    for index, obj in enumerate(detected_objects):
         image = {}
-        try:
-            img = np.array(img)
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        except Exception as e:
-            raise gr.Error(f"Error processing object {index}: {str(e)}")
+        object_img = obj['image']
+        object_coord = obj['xyxy']
+        
+        img = np.array(object_img)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         
         result = text_model.ocr(img)
         result = result[0]
         
         if result is None:
-            gr.Warning(f"OCR failed to extract text from object {index}")
+            print(f"Warning: OCR failed to extract text from object {index}")
             continue
 
         extracted_text = [line[1][0] for line in result]
         # extracted_score = [line[1][1] for line in result]
         
         if len(extracted_text) == 0:
-            gr.Warning(f"No text was extracted from object {index}")
+            print(f"Warning: No text was extracted from object {index}")
             continue
         else:
             image_text, num_of_matched_words = check_text(extracted_text, input_text)
             
             if num_of_matched_words == 0:
-                gr.Warning(f"Input text and extracted text do not match from object {index}")
+                print(f"Warning: Input text and extracted text do not match from object {index}")
                 continue
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             image['image'] = Image.fromarray(img)
             image['text'] = image_text
             image['score'] = num_of_matched_words
+            image['coord'] = object_coord
             
             detected_obj_list.append(image)
-
-        # boxes = [line[0] for line in result]
-        # text = [texts.append(line[1][0]) for line in result]
-        # score = [scores.append(line[1][1]) for line in result]
-        
-        # im_show = draw_ocr(img, boxes, texts, scores, font_path='PaddleOCR/doc/fonts/simfang.ttf')
-        # im_show = Image.fromarray(im_show)
-        # im_show.show()
+            
         if len(detected_obj_list) == 0:
-            gr.Warning("No matching text found in any detected objects.")
+            print(f"Warning: No matching text found in any detected objects.")
             return []
     return detected_obj_list
    
 def extract_final_object(detected_object_list):
     
     if len(detected_object_list) == 0:
-        raise gr.Error("No object was detected. Unable to extract final object")
+        print(f"Error: No object was detected. Unable to extract final object")
+        return None
     
     from operator import itemgetter
     detected_object_list = sorted(detected_object_list, key=itemgetter('score'), reverse=True)
@@ -283,9 +246,57 @@ def run_image(runner,
     final_object = extract_final_object(detected_objects_list)
     
     # returning final image
-    image = final_object['image']
-    return image
+    # image = final_object['image']
+    # return image
+    if final_object is None:
+        print(f"Error: No object was detected. Unable to display final object")
+        return None
+    else:
+        return final_object
 
+def get_xyxy_from_yolo(label_file, img_w, img_h): 
+    bboxes = []
+    with open(label_file, 'r') as f:
+        for line in f:
+            parts = line.strip().split()
+            
+            if len(parts) < 5:
+                continue  # Skip invalid lines
+            
+            x_center, y_center, bbox_width, bbox_height = map(float, parts[1:])
+            
+            x_center = x_center * img_w
+            bbox_width = bbox_width * img_w
+            y_center = y_center * img_h
+            bbox_height = bbox_height * img_h  
+            
+            x1 = x_center - bbox_width / 2
+            y1 = y_center - bbox_height / 2
+            x2 = x_center + bbox_width / 2
+            y2 = y_center + bbox_height / 2
+            
+            bboxes.append([x1, y1, x2, y2])  # Append each bounding box
     
+    return bboxes  # Return a list of bounding boxes
+
+def calculate_iou(pred_bbox, gt_bboxes):
+    if not gt_bboxes:
+        return 0  # No ground truth boxes
     
+    best_iou = 0
+    for gt_bbox in gt_bboxes:
+        xA = max(pred_bbox[0], gt_bbox[0])
+        yA = max(pred_bbox[1], gt_bbox[1])
+        xB = min(pred_bbox[2], gt_bbox[2])
+        yB = min(pred_bbox[3], gt_bbox[3])
+
+        interArea = max(0, xB - xA) * max(0, yB - yA)
+        boxAArea = (pred_bbox[2] - pred_bbox[0]) * (pred_bbox[3] - pred_bbox[1])
+        boxBArea = (gt_bbox[2] - gt_bbox[0]) * (gt_bbox[3] - gt_bbox[1])
+
+        iou = interArea / float(boxAArea + boxBArea - interArea) if boxAArea + boxBArea - interArea > 0 else 0
+        best_iou = max(best_iou, iou)
     
+    return best_iou
+
+
