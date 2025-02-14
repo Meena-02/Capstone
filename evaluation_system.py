@@ -21,8 +21,10 @@ import torch
 
 torch.cuda.empty_cache()
 
-INPUT_CSV_FILE = 'Dataset/Visual/VP002/test_a.csv'
-OUTPUT_CSV_FILE = "Dataset/Visual/VP002/evaluation_results.csv"
+INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset.csv'
+OUTPUT_CSV_FILE = "Dataset/Visual/evaluation_results.csv"
+# INPUT_CSV_FILE = 'Dataset/Visual/VP001/test_a.csv'
+# OUTPUT_CSV_FILE = 'Dataset/Visual/VP001/evaluation_results.csv'
 df = pd.read_csv(INPUT_CSV_FILE)
 
 results = {
@@ -97,6 +99,13 @@ for index, row in df.iterrows():
     
     if yolo_bboxes is None or final_obj is None:
         print(f"Error: Predicted bbox or Ground truth bbox is None. Skipping IOU calculation")
+        results['image_id'].append(row['target_img'])
+        results['iou'].append(0)
+        results['cer'].append(0)
+        results['wer'].append(0)
+        results['exact_match'].append(0)
+        results['fuzzy_score'].append(0)
+        results['overall_success'].append(0)
         continue
     
     iou_score = eval.calculate_iou(final_obj['coord'], yolo_bboxes)

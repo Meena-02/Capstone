@@ -99,10 +99,12 @@ def extract_texts(detected_objects, text_model, input_text):
                 image_text.append(word)
                  
         num_of_matched_words = 0
+        common_words = []
         for word in image_text:
             if word in input_text:
                 num_of_matched_words += 1
-        return image_text, num_of_matched_words 
+                common_words.append(word)
+        return common_words, num_of_matched_words 
 
     
     for index, obj in enumerate(detected_objects):
@@ -206,7 +208,7 @@ def run_image(runner,
         pred_instances = output.pred_instances
         
     nms_thr = adaptive_nms(pred_instances.bboxes)
-    score_thr = 0.3
+    score_thr = 0.2
     max_num_boxes = 100
     
     keep = nms(pred_instances.bboxes,
