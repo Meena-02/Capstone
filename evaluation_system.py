@@ -37,7 +37,6 @@ results = {
     'overall_success': []
 }
 
-
 paddle_ocr = PaddleOCR(lang='en')
 demo_cfg = eval.read_config("config.yaml")
 visual_cfg = Config.fromfile(demo_cfg['Visual']['config_path'])
