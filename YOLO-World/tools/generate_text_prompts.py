@@ -13,7 +13,7 @@ if __name__ == "__main__":
         default='./pretrained_models/clip-vit-base-patch32-projection')
     parser.add_argument('--text',
                         type=str,
-                        default='data/captions/coco_class_captions.json')
+                        default='YOLO-World/data/captions/coco_class_captions.json')
     parser.add_argument('--out', type=str, default='output.npy')
 
     args = parser.parse_args()

@@ -59,5 +59,5 @@ class YOLOWDetDataPreprocessor(DetDataPreprocessor):
             data_samples_output['masks'] = data_samples['masks']
         if 'is_detection' in data_samples:
             data_samples_output['is_detection'] = data_samples['is_detection']
-
+             
         return {'inputs': inputs, 'data_samples': data_samples_output}

@@ -177,7 +177,7 @@ class YOLOWorldImageDetector(YOLODetector):
         self.num_test_classes = num_test_classes
         self.prompt_dim = prompt_dim
         super().__init__(*args, **kwargs)
-        self.has_embed = False
+        self.has_embed = False # false
         self.txt_feats = None
         self.image_prompt_encoder = ImagePromptEncoder(
             vision_encoder=vision_model)
@@ -199,7 +199,7 @@ class YOLOWorldImageDetector(YOLODetector):
         """Predict results from a batch of inputs and data samples with post-
         processing.
         """
-
+        
         img_feats, txt_feats = self.extract_feat(batch_inputs,
                                                  batch_data_samples)
 
@@ -239,6 +239,7 @@ class YOLOWorldImageDetector(YOLODetector):
         """Extract features."""
         # only image features
         texts = None
+        txt_feats = None
         if self.has_embed:
             img_feats, _ = self.backbone(batch_inputs, None)
             txt_feats = self.txt_feats
