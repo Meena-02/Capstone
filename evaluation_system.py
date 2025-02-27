@@ -21,19 +21,29 @@ import torch
 
 torch.cuda.empty_cache()
 
-INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset.csv'
-OUTPUT_CSV_FILE = "Dataset/Visual/evaluation_results.csv"
-# INPUT_CSV_FILE = 'Dataset/Visual/VP001/test_a.csv'
-# OUTPUT_CSV_FILE = 'Dataset/Visual/VP001/evaluation_results.csv'
+# INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset.csv'
+# OUTPUT_CSV_FILE = "Dataset/Visual/eval_results_baseline.csv"
+
+INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset_edited.csv'
+OUTPUT_CSV_FILE = "Dataset/Visual/eval_results_trans_bg.csv"
+
+# INPUT_CSV_FILE = 'Dataset/Visual/VP005/test_a.csv'
+# OUTPUT_CSV_FILE = 'Dataset/Visual/VP005/eval_results_baseline.csv'
+
+# INPUT_CSV_FILE = 'Dataset/Visual/VP005/test_a_edited.csv'
+# OUTPUT_CSV_FILE = 'Dataset/Visual/VP005/eval_results_trans_bg.csv'
+
 df = pd.read_csv(INPUT_CSV_FILE)
 
 results = {
     'image_id': [],
     'iou' : [],
+    'vis_success': [],
     'cer': [],
     'wer': [],
     'exact_match': [],
     'fuzzy_score': [],
+    'text_success': [],
     'overall_success': []
 }
 
@@ -100,10 +110,12 @@ for index, row in df.iterrows():
         print(f"Error: Predicted bbox or Ground truth bbox is None. Skipping IOU calculation")
         results['image_id'].append(row['target_img'])
         results['iou'].append(0)
+        results['vis_success'].append(0)
         results['cer'].append(0)
         results['wer'].append(0)
         results['exact_match'].append(0)
         results['fuzzy_score'].append(0)
+        results['text_success'].append(0)
         results['overall_success'].append(0)
         continue
     
@@ -124,14 +136,18 @@ for index, row in df.iterrows():
 
     # Determine overall success
     overall_success = 1 if iou_score >= 0.5 and fuzzy_score >= 50 else 0
+    vis_success = 1 if iou_score >= 0.5 else 0
+    text_success = 1 if fuzzy_score >= 0.5 else 0
 
     # Store results
     results['image_id'].append(row['target_img'])
     results['iou'].append(iou_score)
+    results['vis_success'].append(vis_success)
     results['cer'].append(cer)
     results['wer'].append(wer)
     results['exact_match'].append(exact_match)
     results['fuzzy_score'].append(fuzzy_score)
+    results['text_success'].append(text_success)
     results['overall_success'].append(overall_success)
 
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -139,11 +155,17 @@ for index, row in df.iterrows():
 # Convert results to DataFrame
 results_df = pd.DataFrame(results)
 results_df.to_csv(OUTPUT_CSV_FILE, index=False)
-print("\nEvaluation complete! Results saved to evaluation_results.csv")
+print(f"\nEvaluation complete! Results saved to {OUTPUT_CSV_FILE}")
 
 # Compute Overall Accuracy
 overall_accuracy = results_df['overall_success'].mean()
 print(f"\nOverall End-to-End System Accuracy: {overall_accuracy:.2%}")
+
+visual_accuracy = results_df['vis_success'].mean()
+print(f"\nVisual Accuracy: {visual_accuracy:.2%}")
+
+text_accuracy = results_df['text_success'].mean()
+print(f"\nText Accuracy: {overall_accuracy:.2%}")
 
 # Generate Confusion Matrix
 y_true = results_df['overall_success']

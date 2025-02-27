@@ -38,7 +38,7 @@ LABEL_ANNOTATOR = LabelAnnotator(text_padding=4,
                                  text_scale=0.5,
                                  text_thickness=1)
 
-def generate_image_embeddings(prompt_images,
+def generate_image_embeddings(prompt_image,
                               vision_encoder,
                               vision_processor,
                               projector,
