@@ -301,4 +301,14 @@ def calculate_iou(pred_bbox, gt_bboxes):
     
     return best_iou
 
-
+# results = {
+#     'image_id': [],
+#     'iou' : [],
+#     'vis_score': [],
+#     'cer': [],
+#     'wer': [],
+#     'exact_match': [],
+#     'fuzzy_score': [],
+#     'text_score': [],
+#     'overall_success': []
+# }
