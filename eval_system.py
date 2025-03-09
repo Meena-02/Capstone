@@ -137,7 +137,7 @@ for index, row in df.iterrows():
     # Determine overall success
     overall_success = 1 if iou_score >= 0.5 and fuzzy_score >= 50 else 0
     vis_success = 1 if iou_score >= 0.5 else 0
-    text_success = 1 if fuzzy_score >= 0.5 else 0
+    text_success = 1 if fuzzy_score >= 50 else 0
 
     # Store results
     results['image_id'].append(row['target_img'])
