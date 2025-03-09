@@ -1,61 +1,58 @@
 image_id,iou,vis_success,cer,wer,exact_match,fuzzy_score,text_success,overall_success
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/1.jpeg,0.9617081218087369,1,0.8,0.75,0,33,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/2.jpg,0.8614541436232612,1,0.8148148148148148,1.0,0,43,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/3.jpeg,0.918311747093211,1,1.9142857142857144,1.8,0,51,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/4.jpeg,0.9511403175048865,1,1.2692307692307692,1.2,0,61,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/5.jpeg,0.9413437459953298,1,0.8275862068965517,0.75,0,29,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/6.jpeg,0.9788597473867291,1,0.3076923076923077,0.25,0,80,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/7.jpeg,0.8571661264357814,1,0.19444444444444445,0.42857142857142855,0,88,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/8.jpg,0.9238834331937935,1,0.38461538461538464,0.25,0,74,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/9.jpeg,0.98273012456521,1,0.2608695652173913,0.375,0,83,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/1.jpeg,0.9617219834898055,1,0.8,0.75,0,33,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/2.jpg,0.8614439686130863,1,0.8148148148148148,1.0,0,43,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/3.jpeg,0.9183038993826479,1,1.9142857142857144,1.8,0,51,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/4.jpeg,0.9511196628029109,1,1.2692307692307692,1.2,0,61,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/5.jpeg,0.9413532821565345,1,0.8275862068965517,0.75,0,29,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/6.jpeg,0.9788627534390283,1,0.3076923076923077,0.25,0,80,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/7.jpeg,0.8571703866457826,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/8.jpg,0.9238928264721156,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/9.jpeg,0.98272911213396,1,0.2608695652173913,0.375,0,83,1,1
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/10.jpeg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/11.jpeg,0.9693739731516375,1,2.2,2.0,0,48,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/12.jpeg,0.9359222638613797,1,0.42857142857142855,0.42857142857142855,0,68,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/13.jpeg,0.9455521185188832,1,0.24324324324324326,0.3333333333333333,0,88,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/14.jpeg,0.8620653427250007,1,0.6,0.6666666666666666,0,77,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/15.jpg,0.9621028773464468,1,0.8125,0.8,0,32,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/16.jpeg,0.8191915794673132,1,0.532258064516129,0.625,0,79,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/17.jpeg,0.28560811181858975,0,1.2413793103448276,1.4,0,51,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/18.jpg,0.5350061274094513,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/19.jpg,0.8991300447846706,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/20.jpg,0.9473434711687484,1,0.4827586206896552,0.5,0,68,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/21.jpg,0.9827882310865041,1,0.625,0.75,0,59,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/11.jpeg,0.9693908657133561,1,2.2,2.0,0,48,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/12.jpeg,0.9359187478847404,1,0.29411764705882354,0.2,0,87,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/13.jpeg,0.9455532497812064,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/14.jpeg,0.862107210537913,1,0.6,0.6666666666666666,0,77,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/15.jpg,0.9620862681511269,1,0.8125,0.8,0,32,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/16.jpeg,0.8192099356290369,1,0.9166666666666666,1.0,0,70,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/17.jpeg,0.2856005613604095,0,1.2413793103448276,1.4,0,51,1,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/18.jpg,0.5350018798202657,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/19.jpg,0.8991389134857689,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/20.jpg,0.9473388327811874,1,0.4827586206896552,0.5,0,68,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/21.jpg,0.9827852119872176,1,0.625,0.75,0,59,1,1
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/22.jpg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/23.jpg,0.9670813939417926,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/24.jpeg,0.28036717913643394,0,0.2608695652173913,0.3333333333333333,0,88,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/25.jpg,0.6593458924401855,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/26.jpg,0.9352597508685592,1,0.25806451612903225,0.2,0,89,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/27.jpeg,0.7629094037770626,1,0.21212121212121213,0.2,0,87,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/28.jpg,0.7326557660607056,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/29.jpg,0.6181530347999733,1,0.1875,0.16666666666666666,0,90,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/23.jpg,0.9670685971395494,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/24.jpeg,0.28036411781255177,0,0.2608695652173913,0.3333333333333333,0,88,1,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/25.jpg,0.6593528256435081,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/26.jpg,0.9352760884496636,1,0.25806451612903225,0.2,0,89,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/27.jpeg,0.7629103937620149,1,0.21212121212121213,0.2,0,87,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/28.jpg,0.7326432728755057,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/29.jpg,0.618157366345781,1,0.1875,0.16666666666666666,0,90,1,1
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/30.jpg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/1_1.jpeg,0.8276032840680787,1,0.05128205128205128,0.14285714285714285,0,97,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/2_1.jpg,0.9418947632561359,1,0.20833333333333334,0.25,0,88,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/3_1.jpeg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/4_1.jpeg,0.9646892310198761,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/5_1.jpeg,0.9627343976690202,1,0.3170731707317073,0.3333333333333333,0,81,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/6_1.jpeg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/7_1.jpeg,0.43219000416622344,0,0.0,0.0,1,100,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/8_1.jpg,0.8518091389530444,1,0.6818181818181818,0.6666666666666666,0,48,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/9_1.jpeg,0.0,0,0.75,0.6666666666666666,0,40,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/10_1.jpeg,0.9466808464864469,1,2.0588235294117645,2.5,0,49,1,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/11_1.jpeg,0.9493953555664021,1,0.45454545454545453,0.5,0,71,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/12_1.jpeg,0.9595076281668291,1,0.4166666666666667,0.5,0,70,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/13_1.jpeg,0.817216179360402,1,0.4166666666666667,0.4,0,74,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/14_1.jpeg,0.9606933210583872,1,0.5789473684210527,0.75,0,63,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/15_1.jpg,0.9441433971251713,1,0.16666666666666666,0.25,0,91,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/16 _1.jpeg,0.8220243431331152,1,0.1951219512195122,0.3333333333333333,0,91,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/17 _1.jpeg,0.9079970439679667,1,2.3333333333333335,2.0,0,46,1,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/1_1.jpeg,0.8275927760420636,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/2_1.jpg,0.9419010216602127,1,0.20833333333333334,0.25,0,88,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/4_1.jpeg,0.9646812621304206,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/5_1.jpeg,0.9627314590923257,1,0.3170731707317073,0.3333333333333333,0,81,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/7_1.jpeg,0.43218782766271063,0,0.0,0.0,1,100,1,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/8_1.jpg,0.8517835969090148,1,0.6818181818181818,0.6666666666666666,0,48,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/9_1.jpeg,0.0,0,0.75,0.6666666666666666,0,40,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/10_1.jpeg,0.946681336405087,1,5.833333333333333,5.0,0,26,0,0
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/11_1.jpeg,0.9493991070713075,1,0.45454545454545453,0.5,0,71,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/12_1.jpeg,0.9595015683469074,1,0.4166666666666667,0.5,0,70,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/13_1.jpeg,0.8172217070819257,1,0.6410256410256411,0.5714285714285714,0,53,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/14_1.jpeg,0.9606970356650687,1,0.5789473684210527,0.75,0,63,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/15_1.jpg,0.9441506506772953,1,0.16666666666666666,0.25,0,91,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/16 _1.jpeg,0.8220185720409353,1,0.1951219512195122,0.3333333333333333,0,91,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/17 _1.jpeg,0.9079831455183608,1,2.3333333333333335,2.0,0,46,0,0
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/18 _1.jpg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/19 _1.jpg,0.9447687478963649,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/20 _1.jpg,0.9097365656127546,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/21 _1.jpg,0.906450557589433,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/22 _1.jpg,0.9630871974879595,1,0.35,0.3333333333333333,0,79,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/23 _1.jpg,0.9664447266617119,1,0.0,0.0,1,100,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/24 _1.jpeg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/25 _1.jpg,0.9773722475369807,1,0.3333333333333333,0.25,0,80,1,1
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/26 _1.jpg,0.8990028714699894,1,0.3333333333333333,0.2,0,86,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/19 _1.jpg,0.9447706261419734,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/20 _1.jpg,0.9097496522688523,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/21 _1.jpg,0.90646888167438,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/22 _1.jpg,0.9630450888846491,1,0.35,0.3333333333333333,0,79,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/23 _1.jpg,0.966427962775106,1,0.0,0.0,1,100,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/25 _1.jpg,0.9773786762463571,1,0.3333333333333333,0.25,0,80,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/26 _1.jpg,0.8990026391006112,1,0.3333333333333333,0.2,0,86,1,1
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/27 _1.jpeg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/28 _1.jpg,0.9454225378762078,1,0.18181818181818182,0.3333333333333333,0,92,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/28 _1.jpg,0.9454197627852226,1,0.18181818181818182,0.3333333333333333,0,92,1,1
 /home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/29 _1.jpg,0.0,0,0.0,0.0,0,0,0,0
-/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/30 _1.jpg,0.7068172281037476,1,0.47058823529411764,0.3333333333333333,0,69,1,1
+/home/rse/prog/Capstone/Dataset/Visual/VP002/test_a/30 _1.jpg,0.7068194620294493,1,0.5,0.3333333333333333,0,67,1,1

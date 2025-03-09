@@ -3,7 +3,10 @@ from matplotlib import pyplot as plt
 from PIL import Image
 import os
 
-ocr = PaddleOCR(lang='en')
+ocr = PaddleOCR(lang='en', 
+                ref_algorithm='weights/inference/reg/en_PP-OCRv3_rec_infer.tar',
+                det_algorithm='weights/inference/det/en_PP-OCRv3_det_infer.tar',
+                use_angle_cls=True)
 
 img = os.path.join('Dataset/Text/TM001/1.jpg')
 
