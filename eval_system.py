@@ -1,7 +1,11 @@
+#   TESTS:
+#       test_a.csv
+#       test_a_edited.csv
+
 import sys
 import os
 from PIL import Image
-import evaluation_helper_function as eval
+import eval_helper_functions as eval
 import numpy as np
 import pandas as pd
 from fuzzywuzzy import fuzz
@@ -132,7 +136,7 @@ for index, row in df.iterrows():
 
     # Compute Text Matching Metrics
     exact_match = int(ground_truth_text == extracted_text)
-    fuzzy_score = fuzz.ratio(ground_truth_text, extracted_text)
+    fuzzy_score = fuzz.token_sort_ratio(ground_truth_text, extracted_text)
 
     # Determine overall success
     overall_success = 1 if iou_score >= 0.5 and fuzzy_score >= 50 else 0

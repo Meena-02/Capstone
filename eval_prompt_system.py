@@ -1,6 +1,6 @@
 import os
-from PIL import Image
-import evaluation_helper_function as eval
+from PIL import Image, ImageEnhance
+import eval_helper_functions as eval
 import pandas as pd
 from fuzzywuzzy import fuzz
 from sklearn.metrics import confusion_matrix, precision_recall_curve
@@ -20,12 +20,20 @@ import torch
 torch.cuda.empty_cache()
 
 # INPUT_CSV_FILE = 'Dataset/Visual/VP005/test_a_prompt.csv'
+# OUTPUT_CSV_FILE = 'Dataset/Visual/VP005/eval_results_prompts_improv.csv'
+# OUTPUT_IMAGE_FOLDER = 'Dataset/Visual/VP005/output_prompts_improv'
+
+INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset_prompt.csv'
+OUTPUT_CSV_FILE = 'Dataset/Visual/eval_results_prompts_improv.csv'
+OUTPUT_IMAGE_FOLDER = 'Dataset/Visual/output_prompts_test_imporv'
+
+# INPUT_CSV_FILE = 'Dataset/Visual/VP005/test_a_prompt.csv'
 # OUTPUT_CSV_FILE = 'Dataset/Visual/VP005/eval_results_prompts.csv'
 # OUTPUT_IMAGE_FOLDER = 'Dataset/Visual/VP005/output_prompts'
 
-INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset_prompt.csv'
-OUTPUT_CSV_FILE = 'Dataset/Visual/eval_results_prompts.csv'
-OUTPUT_IMAGE_FOLDER = 'Dataset/Visual/output_prompts'
+# INPUT_CSV_FILE = 'Dataset/Visual/test_full_dataset_prompt.csv'
+# OUTPUT_CSV_FILE = 'Dataset/Visual/eval_results_prompts.csv'
+# OUTPUT_IMAGE_FOLDER = 'Dataset/Visual/output_prompts'
 
 df = pd.read_csv(INPUT_CSV_FILE)
 
@@ -97,15 +105,19 @@ for index, row in df.iterrows():
     print(f"Label file: {row['label_file']}")
     
     target_img = Image.open(row['target_img'])
-    ref_img1 = Image.open(row['ref_img1'])
+    ref_img1 = Image.open(row['ref_img1'])    
     ref_img2 = Image.open(row['ref_img2'])
+    enhancer = ImageEnhance.Contrast(ref_img2)
+    ref_img3 = enhancer.enhance(1.5)
+    
     input_text = row['input_text']
     
     annotated_img = Image.open(row['annotated_img'])
     a_width, a_height = annotated_img.size
     label_file = row['label_file']
     
-    ref_imgs = [ref_img1, ref_img2]
+    ref_imgs = [ref_img1, ref_img2, ref_img3]
+    # ref_imgs = [ref_img1, ref_img2]
     
     yolo_bboxes = eval.get_xyxy_from_yolo(label_file, a_width, a_height)
     final_obj = eval.run_image2(runner, vision_model, processor, txt_feats,
@@ -141,8 +153,8 @@ for index, row in df.iterrows():
 
     # Compute Text Matching Metrics
     exact_match = int(ground_truth_text == extracted_text)
-    fuzzy_score = fuzz.ratio(ground_truth_text, extracted_text)
-
+    fuzzy_score = fuzz.token_sort_ratio(ground_truth_text, extracted_text)
+    
     # Determine overall success
     overall_success = 1 if iou_score >= 0.5 and fuzzy_score >= 50 else 0
     vis_success = 1 if iou_score >= 0.5 else 0
