@@ -1,6 +1,7 @@
 import gradio as gr
-import helper_functions as hf
+import video_hf as hf
 from PIL import Image, ImageEnhance
+import os
 
 from paddleocr import PaddleOCR, draw_ocr
 
@@ -18,7 +19,7 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
         
         with gr.Row():
             with gr.Column():
-                target_image = gr.Image(label="Target Image", type="pil")
+                target_video = gr.Video(label="target video")
                 with gr.TabItem("Image 1"):
                     ref_image1 = gr.Image(label='Reference Image', type='pil', height=300)
                 with gr.TabItem("Image 2"):
@@ -27,12 +28,12 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
                     submit_button = gr.Button("Submit")
                     clear_button = gr.Button("Clear")
             with gr.Column():
-                output_image = gr.Image(label="Output Image", type="pil")
+                output_video = gr.Video(label="output video")
                 input_text = gr.Textbox(label="Text Prompt")
                 
-        def validate_and_run(target_image, input_text, ref_image1, ref_image2):
-            if target_image is None:
-                raise gr.Error("Please upload target image")
+        def validate_and_run(target_video, input_text, ref_image1, ref_image2):
+            if target_video is None:
+                raise gr.Error("Please upload target video")
             if not input_text.strip():
                 raise gr.Error("Please enter a text prompt")
             if ref_image1 is None or ref_image2 is None:
@@ -43,21 +44,21 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
             ref_img3 = enhancer.enhance(1.5)
             for img in [ref_image1, ref_image2, ref_img3]:
                 if img is not None:
-                    prompt_images.append(img)        
+                    prompt_images.append(img)          
             
-            output_image = hf.run_image2(runner, vision_encoder, vision_processor, padding_embed, text_model, target_image, input_text, prompt_images)
-            return output_image
+            output_video = hf.run_video(runner, vision_encoder, vision_processor, padding_embed, text_model, target_video, input_text, prompt_images)
+            return output_video
         
         submit_button.click(
             validate_and_run,
-            inputs=[target_image, input_text, ref_image1, ref_image2],
-            outputs=[output_image]
+            inputs=[target_video, input_text, ref_image1, ref_image2],
+            outputs=[output_video]
         )
         
         clear_button.click(
             lambda: [None, None, None, '', None], 
             inputs=[],
-            outputs = [target_image, ref_image1, ref_image2, input_text, output_image])
+            outputs = [target_video, ref_image1, ref_image2, input_text, output_video])
         
         demo.launch()
 
