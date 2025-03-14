@@ -1,6 +1,6 @@
 import gradio as gr
 import helper_functions as hf
-from PIL import Image
+from PIL import Image, ImageEnhance
 
 from paddleocr import PaddleOCR, draw_ocr
 
@@ -23,8 +23,6 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
                     ref_image1 = gr.Image(label='Reference Image', type='pil', height=300)
                 with gr.TabItem("Image 2"):
                     ref_image2 = gr.Image(label="Reference Image", type='pil', height=300)
-                with gr.TabItem("Image 3"):
-                    ref_image3 = gr.Image(label="Reference Image", type='pil', height=300)
                 with gr.Row():
                     submit_button = gr.Button("Submit")
                     clear_button = gr.Button("Clear")
@@ -32,14 +30,16 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
                 output_image = gr.Image(label="Output Image", type="pil")
                 input_text = gr.Textbox(label="Text Prompt")
                 
-        def validate_and_run(target_image, input_text, ref_image1, ref_image2, ref_image3):
+        def validate_and_run(target_image, input_text, ref_image1, ref_image2):
             if target_image is None:
                 raise gr.Error("Please upload target image")
             if not input_text.strip():
                 raise gr.Error("Please enter a text prompt")
             
             prompt_images = []
-            for img in [ref_image1, ref_image2, ref_image3]:
+            enhancer = ImageEnhance.Contrast(ref_image2)
+            ref_img3 = enhancer.enhance(1.5)
+            for img in [ref_image1, ref_image2, ref_img3]:
                 if img is not None:
                     prompt_images.append(img)
             
@@ -51,14 +51,14 @@ def demo(runner, vision_encoder, vision_processor, padding_embed, text_model):
         
         submit_button.click(
             validate_and_run,
-            inputs=[target_image, input_text, ref_image1, ref_image2, ref_image3],
+            inputs=[target_image, input_text, ref_image1, ref_image2],
             outputs=[output_image]
         )
         
         clear_button.click(
-            lambda: [None, None, None, None, '', None], 
+            lambda: [None, None, None, '', None], 
             inputs=[],
-            outputs = [target_image, ref_image1, ref_image2, ref_image3, input_text, output_image])
+            outputs = [target_image, ref_image1, ref_image2, input_text, output_image])
         
         demo.launch()
 

@@ -22,22 +22,6 @@ def read_config(filepath):
         
     return config
 
-class LabelAnnotator(sv.LabelAnnotator):
-
-    @staticmethod
-    def resolve_text_background_xyxy(
-        center_coordinates,
-        text_wh,
-        position,
-    ):
-        center_x, center_y = center_coordinates
-        text_w, text_h = text_wh
-        return center_x, center_y, center_x + text_w, center_y + text_h
-
-LABEL_ANNOTATOR = LabelAnnotator(text_padding=4,
-                                 text_scale=0.5,
-                                 text_thickness=1)
-
 def generate_image_embeddings(prompt_image,
                               vision_encoder,
                               vision_processor,
@@ -89,7 +73,6 @@ def adaptive_nms(bboxes, base_thr=0.5, dense_scene_thr=50):
     return nms_thr
 
 def extract_object(target_image, pred_instances):
-    
     if pred_instances is None:
         raise gr.Error("Prediction instances are missing")
     
@@ -99,40 +82,23 @@ def extract_object(target_image, pred_instances):
     
     if len(xyxy) == 0:
         raise gr.Error("No objects were detected in the target image")
-        
-    # score_thr = np.percentile(confidence, 70)
-    # score_thr = 0.2
-    
-    # index_list = []
-    # index = 0
-    # for x in confidence:
-    #     if x >= score_thr:
-    #         index_list.append(index)
-    #     index += 1
-        
-    # if not index_list:
-    #     raise gr.Error("No objects passed the confidence threshold. Adjust the threshold")
     
     detected_obj = []
     index = len(confidence)
     for x in range(0, index):
+        object = {}
         coord = xyxy[x]
         cropped_img = target_image.crop(tuple(coord))
-        cropped_img.show()
-        detected_obj.append(cropped_img)
-    
-    # for i, x in enumerate(detected_obj):
-    #     img = np.array(x)
-    #     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    #     cv2.imshow(f"object: {i}", img)
-    #     cv2.waitKey(0)
-    
-    # cv2.destroyAllWindows()
+        # cropped_img.show()
+        object['image'] = cropped_img
+        object['xyxy'] = coord
+        detected_obj.append(object)
     
     return detected_obj
 
 def extract_texts(detected_objects, text_model, input_text):
     import re
+    detected_obj_list = []
     
     if detected_objects is None or len(detected_objects) == 0:
         raise gr.Error("No objects detected found for text extraction")
@@ -155,21 +121,24 @@ def extract_texts(detected_objects, text_model, input_text):
                 image_text.append(word)
                  
         num_of_matched_words = 0
+        common_words = []
         for word in image_text:
             if word in input_text:
                 num_of_matched_words += 1
-        return image_text, num_of_matched_words 
+                common_words.append(word)
+        return common_words, num_of_matched_words 
 
-    detected_obj_list = []
-    for index, img in enumerate(detected_objects):
+    for index, obj in enumerate(detected_objects):
         image = {}
         try:
-            img = np.array(img)
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            object_img = obj['image']
+            object_coord = obj['xyxy']
+            img = np.array(object_img)
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         except Exception as e:
             raise gr.Error(f"Error processing object {index}: {str(e)}")
         
-        result = text_model.ocr(img)
+        result = text_model.ocr(img, cls = True)
         result = result[0]
         
         if result is None:
@@ -188,20 +157,13 @@ def extract_texts(detected_objects, text_model, input_text):
             if num_of_matched_words == 0:
                 gr.Warning(f"Input text and extracted text do not match from object {index}")
                 continue
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            image['image'] = Image.fromarray(img)
+            image['image'] = object_img
             image['text'] = image_text
             image['score'] = num_of_matched_words
+            image['coord'] = object_coord
             
             detected_obj_list.append(image)
 
-        # boxes = [line[0] for line in result]
-        # text = [texts.append(line[1][0]) for line in result]
-        # score = [scores.append(line[1][1]) for line in result]
-        
-        # im_show = draw_ocr(img, boxes, texts, scores, font_path='PaddleOCR/doc/fonts/simfang.ttf')
-        # im_show = Image.fromarray(im_show)
-        # im_show.show()
         if len(detected_obj_list) == 0:
             gr.Warning("No matching text found in any detected objects.")
             return []
@@ -267,7 +229,7 @@ def run_image(runner,
         pred_instances = output.pred_instances
         
     nms_thr = adaptive_nms(pred_instances.bboxes)
-    score_thr = 0.3
+    score_thr = 0.2
     max_num_boxes = 100
     
     keep = nms(pred_instances.bboxes,
@@ -306,9 +268,13 @@ def run_image(runner,
     detected_objects_list = extract_texts(detected_objects, text_model, input_text)
     final_object = extract_final_object(detected_objects_list)
     
+    
     # returning final image
-    image = final_object['image']
-    return image
+    if final_object is None:
+        gr.Warning("Error: No object was detected. Unable to display final object")
+        return None
+    else:
+        return final_object['image']
 
 def run_image2(runner,
               vision_encoder,
@@ -361,7 +327,7 @@ def run_image2(runner,
         pred_instances = output.pred_instances
         
     nms_thr = adaptive_nms(pred_instances.bboxes)
-    score_thr = 0.3
+    score_thr = 0.2
     max_num_boxes = 100
     
     keep = nms(pred_instances.bboxes,
@@ -401,6 +367,9 @@ def run_image2(runner,
     final_object = extract_final_object(detected_objects_list)
     
     # returning final image
-    image = final_object['image']
-    return image   
+    if final_object is None:
+        gr.Warning("Error: No object was detected. Unable to display final object")
+        return None
+    else:
+        return final_object['image']  
     
