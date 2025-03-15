@@ -264,12 +264,17 @@ def run_image2(runner,
         # return final_object['image']
         return final_object  
 
-def run_video(runner, vision_encoder, vision_processor, padding_token, text_model, target_video, input_text, prompt_images, frame_skip=10, output_video='output.mp4'):
+def run_video(runner, vision_encoder, vision_processor, padding_token, text_model, target_video, input_text, prompt_images, frame_skip=10, output_video='output.mp4', is_live_stream=False):
     import os
     import subprocess
-    cap = cv2.VideoCapture(target_video)
-    if not cap.isOpened():
-        raise gr.Warning("Error opening video file")
+    
+    if is_live_stream:
+        # If it's a live stream, the target_video is already a file path
+        cap = cv2.VideoCapture(target_video)
+    else:
+        cap = cv2.VideoCapture(target_video)
+        if not cap.isOpened():
+            raise gr.Warning("Error opening video file")
     
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
@@ -309,7 +314,6 @@ def run_video(runner, vision_encoder, vision_processor, padding_token, text_mode
         if detected_object is not None:
             # Draw bounding box on frame
             bbox = detected_object['coord']
-            # print(f'bbox: {bbox}')
             if bbox is not None:
                 x1 = int(bbox[0])
                 y1 = int(bbox[1])
