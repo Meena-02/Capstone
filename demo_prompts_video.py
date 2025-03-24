@@ -5,6 +5,7 @@ import os
 import cv2
 import threading
 import time
+import pyrealsense2 as rs
 
 from paddleocr import PaddleOCR, draw_ocr
 
