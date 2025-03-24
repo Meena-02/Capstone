@@ -319,7 +319,7 @@ def run_video(runner, vision_encoder, vision_processor, padding_token, text_mode
                 y1 = int(bbox[1])
                 x2 = int(bbox[2])
                 y2 = int(bbox[3])
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
                 
         out.write(frame)
     
