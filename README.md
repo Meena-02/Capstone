@@ -132,3 +132,8 @@ Improve OCR accuracy using text enhancement or fine-tuned models
 Add multilingual text support and dynamic thresholding
 
 Deploy the system on an edge device using ONNX/TensorRT
+
+## 👩‍💻 Author
+Meenatchi Selvaraj
+Robotics Systems Engineering @ SIT
+2102767
